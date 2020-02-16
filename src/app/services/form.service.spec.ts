@@ -43,6 +43,7 @@ describe('FormService', () => {
       inputType: 'text',
       initialValue: '',
       fields: [],
+      required: false,
       validators: []
     }
   ] as FormField[];
@@ -62,7 +63,7 @@ describe('FormService', () => {
     });
   });
 
-  xdescribe('convertValidators', () => {
+  describe('convertValidators', () => {
     it('should convert parameters of field to array of validators', () => {
       const parameters = {
         required: true,
@@ -70,11 +71,11 @@ describe('FormService', () => {
         max_length: 10
       } as FormFieldParamsFromResponse;
       const expected = [Validators.required, Validators.minLength(5), Validators.maxLength(10)];
-      expect(service.convertValidators(parameters)).toEqual(expected);
+      expect(service.convertValidators(parameters).length).toBe(3);
     });
   });
 
-  xdescribe('createSingleField', () => {
+  describe('createSingleField', () => {
     it('should create single field', () => {
       const field = {
         id: 1,
@@ -85,13 +86,15 @@ describe('FormService', () => {
         label: 'Test',
         inputType: 'text',
         initialValue: '',
+        required: false,
         fields: [],
         validators: []
       } as FormField;
-      const expectedForm = { test_code: new FormControl('', []) };
-      const form = {};
+      const form: any = {};
       service.createSingleField(form, field);
-      expect(form).toContain(expectedForm);
+      expect(form.test_code).toBeDefined();
+      expect((form.test_code as FormControl).value).toBe('');
+      expect((form.test_code as FormControl).validator).toBeFalsy();
     });
     it('should create multiple field', () => {
       const field = {
@@ -103,18 +106,19 @@ describe('FormService', () => {
         label: 'Test',
         inputType: 'text',
         initialValue: '',
+        required: false,
         fields: [],
         validators: []
       } as FormField;
-      const expectedForm = {
-        test_code: new FormGroup({
-          input: new FormControl('', []),
-          values: new FormArray([])
-        })
-      };
-      const form = {};
+
+      const form: any = {};
       service.createSingleField(form, field);
-      expect(form).toContain(expectedForm);
+      expect(form.test_code).toBeDefined();
+      expect(form.test_code.get('input')).toBeDefined();
+      expect(form.test_code.get('values')).toBeDefined();
+      expect(form.test_code.get('input').value).toBe('');
+      expect(form.test_code.get('values').controls.length).toBe(0);
+      expect(form.test_code.get('input').validator).toBeFalsy();
     });
   });
 
@@ -142,6 +146,51 @@ describe('FormService', () => {
       expect(service.form.get('test_code').get('input').value).toBeFalsy();
       expect((service.form.get('test_code').get('values') as FormArray).controls.length).toBe(1);
       expect((service.form.get('test_code').get('values') as FormArray).controls[0].value).toBe('value');
+    });
+  });
+
+  describe('pushMultipleGroup', () => {
+    it('add row', () => {
+      service.fields = [
+        {
+          id: 1,
+          code: 'test_code',
+          isGroup: true,
+          isMultiple: true,
+          placeholder: '',
+          label: 'Test',
+          inputType: 'text',
+          initialValue: '',
+          required: false,
+          validators: [],
+          fields: [
+            {
+              id: 1,
+              code: 'test_subfield_code',
+              isGroup: false,
+              isMultiple: false,
+              placeholder: 'Test',
+              label: 'Test',
+              inputType: 'text',
+              initialValue: '',
+              required: false,
+              validators: [],
+              fields: []
+            }
+          ]
+        }
+      ];
+      service.form = new FormGroup({
+        test_code: new FormArray([
+          new FormGroup({
+            test_subfield_code: new FormControl('123')
+          })
+        ])
+      });
+      service.pushMultipleGroup('test_code', []);
+      expect((service.form.get('test_code') as FormArray).controls.length).toBe(2);
+      expect(service.form.get('test_code').get('1').get('test_subfield_code')).toBeDefined();
+      expect(service.form.get('test_code').get('1').get('test_subfield_code').value).toBe('');
     });
   });
 });

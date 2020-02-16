@@ -53,6 +53,7 @@
           "name": "Текстовый инпут с параметрами",
           "placeholder": "Введите строку",
           "parameters": {
+            "required": true,
             "max_length": 50,
             "min_length": 5,
             "default_value": "Тест"
@@ -76,7 +77,8 @@
         "attributes": {
           "is_multiple": false,
           "name": "Группа полей",
-          "code": "form_group"
+          "code": "form_group",
+          "required": true
         },
         "relationships": {
           "fields": {

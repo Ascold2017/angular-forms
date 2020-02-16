@@ -49,8 +49,9 @@ export interface FormField {
   code: string;
   label: string;
   inputType: 'text' | null;
-  fields?: FormField[];
+  fields: FormField[];
   initialValue: string | number | boolean;
+  required: boolean;
   validators: ValidatorFn[];
 }
 
@@ -85,17 +86,18 @@ export class FormService {
       label: field.attributes.name,
       inputType: field.relationships.form_attribute_type?.data.attributes.code || null,
       fields: field.relationships.fields ? this.convertFields(field.relationships.fields.data) : [],
-      initialValue: field.attributes.parameters ? field.attributes.parameters.default_value : '',
+      initialValue: field.attributes.parameters?.default_value || '',
+      required: field.attributes.parameters?.required || false,
       validators: field.attributes.parameters ? this.convertValidators(field.attributes.parameters) : []
     }));
   }
 
   createSingleField(formGroup: object, field: FormField): void {
     if (!field.isMultiple) {
-      formGroup[field.code] = new FormControl(field.initialValue, field.validators);
+      formGroup[field.code] = new FormControl(field.initialValue || '', field.validators);
     } else {
       formGroup[field.code] = new FormGroup({
-        input: new FormControl(field.initialValue, field.validators),
+        input: new FormControl(field.initialValue || '', field.validators),
         values: new FormArray([])
       });
     }
@@ -142,6 +144,20 @@ export class FormService {
       values.push(new FormControl(input.value, input.validator));
       input.reset();
     }
+  }
+
+  pushMultipleGroup(fieldCode: string, pathToRootForm: string[] = []) {
+    pathToRootForm = [...pathToRootForm, fieldCode];
+
+    const formArray = pathToRootForm.reduce((form, currentPath) =>
+      Array.isArray(form.controls) ? form.controls[currentPath] : form.get(currentPath), this.form) as FormArray;
+    // tslint:disable-next-line: no-shadowed-variable
+    const fields = pathToRootForm.reduce((fields, currentPath: string) =>
+      fields.find(f => f.code === currentPath).fields, this.fields);
+
+    const subGroup = {};
+    fields.forEach(subField => this.createSingleField(subGroup, subField));
+    formArray.push(new FormGroup(subGroup));
   }
 
   submit() {

@@ -18,4 +18,8 @@ export class ControlComponent {
   addValue() {
    this.formService.pushValueInSingleMultipleField(this.field.code, this.pathToRootForm);
   }
+
+  addRow() {
+    this.formService.pushMultipleGroup(this.field.code, this.pathToRootForm);
+  }
 }
