@@ -1,0 +1,33 @@
+<div [formGroup]="form">
+    <fieldset *ngIf="!field.isGroup && !field.isMultiple">
+        <label>{{ field.label }}</label>
+        <input [formControlName]="field.code" [placeholder]="field.placeholder" class="control">
+    </fieldset>
+    
+    <fieldset *ngIf="!field.isGroup && field.isMultiple" [formGroup]="form.get(field.code)">
+        <label>{{ field.label }}</label>
+        <input formControlName="input" [placeholder]="field.placeholder" class="control">
+        <button type="button" (click)="addValue()">Add value</button>
+        <ul formArrayName="values">
+            <li *ngFor="let valueField of form.get(field.code).get('values').controls; let i = index;">
+                <input [formControlName]="i" [placeholder]="field.placeholder" class="control">>
+            </li>
+        </ul>
+    </fieldset>
+
+    <fieldset *ngIf="field.isGroup && !field.isMultiple">
+        <label>{{ field.label }}</label>
+        <fieldset *ngFor="let subField of field.fields">
+            <app-control [form]="form.get(field.code)" [field]="subField" [pathToRootForm]="pathToRootForm.concat(field.code)"></app-control>
+        </fieldset>
+    </fieldset>
+
+    <fieldset *ngIf="field.isGroup && field.isMultiple" [formArrayName]="field.code">
+        <label>{{ field.label }}</label>
+        <fieldset *ngFor="let formGroupRow of form.get(field.code).controls; let i = index;">
+            <fieldset *ngFor="let subField of field.fields">
+                <app-control [form]="formGroupRow" [field]="subField" [pathToRootForm]="pathToRootForm.concat(field.code).concat(i)"></app-control>
+            </fieldset>
+        </fieldset>
+    </fieldset>
+</div>

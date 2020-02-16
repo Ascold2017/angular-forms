@@ -1,0 +1,11 @@
+.control {
+    border: 1px soild transparent;
+}
+
+.control.ng-valid, .control.ng-valid  {
+    border: 1px solid #42A948; /* green */
+}
+  
+.control.ng-invalid:not(form)  {
+    border: 1px solid #a94442; /* red */
+}

@@ -1,0 +1,4 @@
+<form (ngSubmit)="formService.submit()" [formGroup]="formService.form">
+    <app-control *ngFor="let field of formService.fields" [field]="field" [form]="formService.form"></app-control>
+    <button type="submit">Submit</button>
+</form>
