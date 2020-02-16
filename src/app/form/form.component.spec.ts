@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FormComponent } from './form.component';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { FormService } from '../services/form.service';
 
 describe('FormComponent', () => {
   let component: FormComponent;
@@ -8,7 +10,9 @@ describe('FormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FormComponent ]
+      declarations: [ FormComponent ],
+      imports: [HttpClientModule],
+      providers: [FormService]
     })
     .compileComponents();
   }));
@@ -21,5 +25,17 @@ describe('FormComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should call formService.init on init', () => {
+    const spy = spyOn(component.formService, 'init');
+    component.ngOnInit();
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('should call formService.submit on submit', () => {
+    const spy = spyOn(component.formService, 'submit');
+    component.onSubmit();
+    expect(spy).toHaveBeenCalled();
   });
 });

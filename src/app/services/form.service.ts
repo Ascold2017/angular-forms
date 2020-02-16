@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { FormGroup, FormControl, FormArray, Validator, Validators, ValidatorFn } from '@angular/forms';
 
 // interface of response data
-interface FormFieldParamsFromResponse {
+export interface FormFieldParamsFromResponse {
   default_value: string | number | boolean;
+  required: boolean;
   min_length?: number;
   max_length?: number;
 }
 
-interface FormFieldFromResponse {
+export interface FormFieldFromResponse {
   id: number;
   type: 'form_field' | 'form_field_group';
   attributes: {
@@ -17,7 +18,7 @@ interface FormFieldFromResponse {
     code: string;
     name: string;
     placeholder?: string;
-    parameters: FormFieldParamsFromResponse | null;
+    parameters?: FormFieldParamsFromResponse | null;
   };
   relationships: {
     form_attribute_type?: {
@@ -35,7 +36,7 @@ interface FormFieldFromResponse {
   };
 }
 
-interface FormFieldsFromResponse {
+export interface FormFieldsFromResponse {
   data: FormFieldFromResponse[];
 }
 
@@ -59,9 +60,9 @@ export interface FormField {
 export class FormService {
   public fields: FormField[] = [];
   public form: FormGroup = new FormGroup({});
-  constructor(private http: HttpClient) {}
+  constructor(public http: HttpClient) {}
 
-  private convertValidators(fieldParameters): ValidatorFn[] {
+  convertValidators(fieldParameters): ValidatorFn[] {
     const validators = [];
     if ('required' in fieldParameters) {
       validators.push(Validators.required);
@@ -74,7 +75,7 @@ export class FormService {
     }
     return validators;
   }
-  private convertFields(fields: FormFieldFromResponse[]): FormField[] {
+  convertFields(fields: FormFieldFromResponse[]): FormField[] {
     return fields.map(field => ({
       id: field.id,
       isMultiple: field.attributes.is_multiple,
@@ -89,7 +90,7 @@ export class FormService {
     }));
   }
 
-  private createSingleField(formGroup: object, field: FormField): void {
+  createSingleField(formGroup: object, field: FormField): void {
     if (!field.isMultiple) {
       formGroup[field.code] = new FormControl(field.initialValue, field.validators);
     } else {
