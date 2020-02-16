@@ -1,31 +1,31 @@
-<div [formGroup]="form">
-    <fieldset *ngIf="!field.isGroup && !field.isMultiple">
+<div [formGroup]="form" class="mb-3">
+    <fieldset *ngIf="!field.isGroup && !field.isMultiple" class="mdc-card mdc-card--outlined">
         <label>{{ field.label }}</label>
         <input [formControlName]="field.code" [placeholder]="field.placeholder" class="control">
     </fieldset>
     
-    <fieldset *ngIf="!field.isGroup && field.isMultiple" [formGroup]="form.get(field.code)">
+    <fieldset *ngIf="!field.isGroup && field.isMultiple" [formGroup]="form.get(field.code)" class="mdc-card mdc-card--outlined">
         <label>{{ field.label }}</label>
         <input formControlName="input" [placeholder]="field.placeholder" class="control">
         <button type="button" (click)="addValue()">Add value</button>
         <ul formArrayName="values">
             <li *ngFor="let valueField of form.get(field.code).get('values').controls; let i = index;">
-                <input [formControlName]="i" [placeholder]="field.placeholder" class="control">>
+                <input [formControlName]="i" [placeholder]="field.placeholder" class="control">
             </li>
         </ul>
     </fieldset>
 
-    <fieldset *ngIf="field.isGroup && !field.isMultiple">
+    <fieldset *ngIf="field.isGroup && !field.isMultiple" class="mdc-card mdc-card--outlined">
         <label>{{ field.label }}</label>
-        <fieldset *ngFor="let subField of field.fields">
+        <fieldset *ngFor="let subField of field.fields" class="mdc-card mdc-card--outlined mb-2">
             <app-control [form]="form.get(field.code)" [field]="subField" [pathToRootForm]="pathToRootForm.concat(field.code)"></app-control>
         </fieldset>
     </fieldset>
 
-    <fieldset *ngIf="field.isGroup && field.isMultiple" [formArrayName]="field.code">
+    <fieldset *ngIf="field.isGroup && field.isMultiple" [formArrayName]="field.code" class="mdc-card mdc-card--outlined">
         <label>{{ field.label }}</label>
-        <fieldset *ngFor="let formGroupRow of form.get(field.code).controls; let i = index;">
-            <fieldset *ngFor="let subField of field.fields">
+        <fieldset *ngFor="let formGroupRow of form.get(field.code).controls; let i = index;" class="mdc-card mdc-card--outlined mb-2">
+            <fieldset *ngFor="let subField of field.fields" class="mdc-card mdc-card--outlined mb-1">
                 <app-control [form]="formGroupRow" [field]="subField" [pathToRootForm]="pathToRootForm.concat(field.code).concat(i)"></app-control>
             </fieldset>
         </fieldset>

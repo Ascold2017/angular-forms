@@ -1,4 +1,7 @@
-<form (ngSubmit)="formService.submit()" [formGroup]="formService.form">
+<form (ngSubmit)="formService.submit()" [formGroup]="formService.form" class="mdc-card mdc-card--outlined">
     <app-control *ngFor="let field of formService.fields" [field]="field" [form]="formService.form"></app-control>
-    <button type="submit">Submit</button>
+    <button type="submit" class="mdc-button">
+        <div class="mdc-button__ripple"></div>
+        <span class="mdc-button__label">Submit</span>
+    </button>
 </form>
